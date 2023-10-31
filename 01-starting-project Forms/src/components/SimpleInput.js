@@ -1,38 +1,56 @@
-import { useRef, useState } from "react";
+import React, { useState } from "react";
+
 const SimpleInput = (props) => {
-  const Nameinputref = useRef();
+  // const nameInputRef = useRef();
 
-  const [enteredname, setenteredname] = useState();
-  const inputnamechangehandler = (event) => {
-    setenteredname(event.target.value);
+  const [enteredName, setEnteredName] = useState("");
+  const [enteredNameTouched, setEnteredNameTouched] = useState(false);
+
+  const enterednameisvalid = enteredName.trim() !== "";
+  const inputIsInvalid = !enterednameisvalid && enteredNameTouched;
+
+  const inputNameChangeHandler = (event) => {
+    setEnteredName(event.target.value);
+    setEnteredNameTouched(true);
   };
 
-  const formsubmitehandler = (event) => {
-    event.preventDefault();
-    if(enteredname.trim() == '')
-    {
-      return ; 
-    }
-    console.log(enteredname);
-    const enteredvalue = Nameinputref.current.value;
-
-    console.log(enteredvalue);
-    Nameinputref.current.value = '';
-    // setenteredname(''); 
+  const nameInputBlurHandler = () => {
+    setEnteredNameTouched(true);
   };
+
+  const formSubmitHandler = (event) => {
+  event.preventDefault();
+
+  if (!enterednameisvalid) {
+    return;
+  }
+
+  console.log(enteredName);
+
+  setEnteredName(""); // Clear the enteredName state
+  setEnteredNameTouched(false);
+};
+
+
+  const nameInputClass = inputIsInvalid
+    ? "form-control invalid"
+    : "form-control";
+
   return (
-    <form onSubmit={formsubmitehandler}>
-      <div className="form-control">
+    <form onSubmit={formSubmitHandler}>
+      <div className={nameInputClass}>
         <label htmlFor="name">Your Name</label>
         <input
-          ref={Nameinputref}
           type="text"
           id="name"
-          onChange={inputnamechangehandler}
+          value={enteredName}
+          onChange={inputNameChangeHandler}
+          onBlur={nameInputBlurHandler}
         />
+        {inputIsInvalid && <p className="error-text">Name must not be empty</p>}
       </div>
       <div className="form-actions">
-        <button>Submit</button>
+        <button type="submit">Submit</button>
       </div>
     </form>
   );
